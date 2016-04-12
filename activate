@@ -1,0 +1,77 @@
+#!/bin/sh
+
+# This file must be used with "source bin/activate" *from bash*
+# you cannot run it directly
+
+deactivate () {
+    # reset old environment variables
+    if [ -n "$_OLD_DEPOT_PATH" ] ; then
+        PATH="$_OLD_DEPOT_PATH"
+        export PATH
+        unset _OLD_DEPOT_PATH
+    fi
+
+    # This should detect bash and zsh, which have a hash command that must
+    # be called to get it to forget past commands.  Without forgetting
+    # past commands the $PATH changes we made may not be respected
+    if [ -n "$BASH" -o -n "$ZSH_VERSION" ] ; then
+        hash -r
+    fi
+
+    if [ -n "$_OLD_DEPOT_PS1" ] ; then
+        PS1="$_OLD_DEPOT_PS1"
+        export PS1
+        unset _OLD_DEPOT_PS1
+    fi
+
+    unset DEPOT_ENV
+    if [ ! "$1" = "nondestructive" ] ; then
+        # Self destruct!
+        unset -f deactivate
+    fi
+}
+
+checkout_depot_tools () {
+	git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git $*
+}
+
+# unset irrelavent variables
+deactivate nondestructive
+
+SYSTEM=`uname -s`
+
+if [ "x$SYSTEM" = "xDarwin" ]; then
+    SCRIPTPATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
+else
+    SCRIPTPATH=$(dirname $(readlink -f "$0"))
+fi
+
+DEPOT_ENV=${SCRIPTPATH}
+export DEPOT_ENV
+
+_OLD_DEPOT_PATH="$PATH"
+PATH="$DEPOT_ENV/depot_tools:$PATH"
+export PATH
+
+if [ -z "$DEPOT_ENV_DISABLE_PROMPT" ] ; then
+    _OLD_DEPOT_PS1="$PS1"
+    if [ "x(depot) " != x ] ; then
+	PS1="(depot) $PS1"
+    else
+        if [ "`basename \"$DEPOT_ENV\"`" = "__" ] ; then
+            # special case for Aspen magic directories
+            # see http://www.zetadev.com/software/aspen/
+            PS1="[`basename \`dirname \"$DEPOT_ENV\"\``] $PS1"
+        else
+            PS1="(`basename \"$DEPOT_ENV\"`)$PS1"
+        fi
+    fi
+    export PS1
+fi
+
+# This should detect bash and zsh, which have a hash command that must
+# be called to get it to forget past commands.  Without forgetting
+# past commands the $PATH changes we made may not be respected
+if [ -n "$BASH" -o -n "$ZSH_VERSION" ] ; then
+    hash -r
+fi
