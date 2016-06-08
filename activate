@@ -32,7 +32,7 @@ deactivate () {
 }
 
 checkout_depot_tools () {
-	git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git $*
+	git clone https://gitlab.com/zhanggyb/depot_tools.git $*
 }
 
 # unset irrelavent variables
