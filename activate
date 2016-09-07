@@ -39,13 +39,7 @@ checkout_depot_tools () {
 deactivate nondestructive
 
 SYSTEM=`uname -s`
-
-if [ "x$SYSTEM" = "xDarwin" ]; then
-    SCRIPTPATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
-else
-    SCRIPTPATH=$(dirname $(readlink -f "$0"))
-fi
-
+SCRIPTPATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
 DEPOT_ENV=${SCRIPTPATH}
 export DEPOT_ENV
 
@@ -75,3 +69,4 @@ fi
 if [ -n "$BASH" -o -n "$ZSH_VERSION" ] ; then
     hash -r
 fi
+
